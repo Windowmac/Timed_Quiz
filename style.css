@@ -1,3 +1,38 @@
+h1 {
+  font-size: 48px;
+}
+
+li {
+  box-shadow: 0px 0px 0px 2px #9eb8ff;
+  background: linear-gradient(to bottom, #7892c2 5%, #476e9e 100%);
+  background-color: #7892c2;
+  border-radius: 10px;
+  border: 1px solid #4e6096;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 19px;
+  padding: 9px 70px;
+  text-shadow: 0px 1px 0px #283966;
+  max-width: 120px;
+  transition: all 0.4s ease-in-out;
+}
+
+#color-text {
+  display: inline;
+}
+
+#question {
+  display: flex;
+  flex-flow: column wrap;
+  font-size: 35px;
+  font-family: Arial;
+  margin: 8px;
+  padding: 5px;
+  transition: all 0.4s ease-in-out;
+}
+
 #start-button {
   box-shadow: 0px 0px 0px 2px #9eb8ff;
   background: linear-gradient(to bottom, #7892c2 5%, #476e9e 100%);
@@ -19,4 +54,15 @@
 #start-button:active {
   position: relative;
   top: 1px;
+}
+
+#announcement {
+  display: inline;
+  font-weight: bold;
+}
+
+#countdown {
+  text-align: end;
+  display: inline;
+  margin-left: 284px;
 }
