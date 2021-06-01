@@ -2,6 +2,14 @@ h1 {
   font-size: 48px;
 }
 
+h2 {
+  font-size: 36px;
+  display: inline-block;
+  margin: 25px;
+  padding: 10px;
+  margin-top: 84px;
+}
+
 li {
   box-shadow: 0px 0px 0px 2px #9eb8ff;
   background: linear-gradient(to bottom, #7892c2 5%, #476e9e 100%);
@@ -15,8 +23,23 @@ li {
   font-size: 19px;
   padding: 9px 70px;
   text-shadow: 0px 1px 0px #283966;
-  max-width: 120px;
+  max-width: 225px;
+  margin: 18px;
   transition: all 0.4s ease-in-out;
+}
+
+li:hover {
+  background: linear-gradient(to bottom, #476e9e 5%, #7892c2 100%);
+  background-color: #476e9e;
+}
+
+li:active {
+  position: relative;
+  top: 1px;
+}
+
+input {
+  font-size: 35px;
 }
 
 #color-text {
@@ -59,10 +82,36 @@ li {
 #announcement {
   display: inline;
   font-weight: bold;
+  position: relative;
 }
 
 #countdown {
   text-align: end;
   display: inline;
-  margin-left: 284px;
+  position: absolute;
+  right: -10px;
+  top: 100px;
+}
+
+#submit {
+  box-shadow: 0px 0px 0px 2px #9eb8ff;
+  background: linear-gradient(to bottom, #ff453f 5%, #a71f1f 100%);
+  background-color: #f1403a;
+  border-radius: 10px;
+  border: 1px solid #964e4e;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 19px;
+  padding: 9px 20px;
+  text-shadow: 0px 1px 0px #283966;
+  max-width: 120px;
+  margin-left: 35px;
+  margin-top: 30px;
+}
+
+#submit:hover {
+  background: linear-gradient(to bottom, #a71f1f 5%, #ff453f 100%);
+  background-color: #be4141;
 }

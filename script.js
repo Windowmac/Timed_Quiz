@@ -54,10 +54,14 @@ const questionEl = document.getElementById('question');
 
 const colorTextEl = document.getElementById('color-text');
 const announcementEl = document.getElementById('announcement');
+const containerEl = document.getElementById('question-container');
 const listItems = document.getElementsByTagName('li');
 
 function handleStartButton(event) {
   startCountdown();
+  startButtonEl.remove();
+  document.getElementById('title').remove();
+  announcementEl.textContent = 'Go!';
 
   function startCountdown() {
     const timeInterval = setInterval(handleInterval, 1000);
@@ -66,12 +70,13 @@ function handleStartButton(event) {
       countdownEl.textContent = `${timeLeft} seconds left`;
       if (timeLeft <= 0) {
         clearInterval(timeInterval);
-        endGame(timeLeft);
+        if (questionCount < questionArray.length) {
+          endGame(timeLeft);
+        }
       }
     }
   }
   startQuestions();
-  startButtonEl.remove();
 
   function startQuestions() {
     if (questionArray[questionCount]) {
@@ -92,9 +97,6 @@ function handleStartButton(event) {
 
           if (userChoice === correctChoice) {
             questionCount++;
-            for (let i = 0; i < listItems.length; i++) {
-              console.log(listItems[i]);
-            }
             colorTextEl.textContent = 'Correct! ';
             colorTextEl.style.color = 'blue';
             announcementEl.textContent = 'Next question: ';
@@ -111,22 +113,70 @@ function handleStartButton(event) {
     } else {
       endGame(timeLeft);
     }
+  }
+  function endGame(timeLeft) {
+    let score = timeLeft * 100;
+    if (score < 0) {
+      score = 0;
+    }
 
-    function endGame(timeLeft) {
-      let score = timeLeft * 100;
-      if (score < 0) {
-        score = 0;
+    countdownEl.remove();
+
+    colorTextEl.textContent = 'Congratulations!';
+    colorTextEl.style.color = 'green';
+    announcementEl.textContent = 'your score is: ' + score;
+
+    questionEl.remove();
+    //add in form element for initials
+    handleForm();
+    function handleForm() {
+      //create a form input element with a name of initials and placeholder text of 'enter initials here'
+      //place a submit button just to the right of the form input
+      const inputEl = document.createElement('input');
+      inputEl.placeholder = 'Enter your initials here';
+      inputEl.name = 'initials';
+      inputEl.id = 'initials-input';
+      const submitEl = document.createElement('btn');
+      submitEl.id = 'submit';
+      submitEl.textContent = 'Submit';
+      containerEl.appendChild(inputEl);
+      containerEl.appendChild(submitEl);
+
+      submitEl.addEventListener('click', handleSubmit);
+
+      function handleSubmit(event) {
+        event.preventDefault();
+        const playerName = inputEl.value;
+        console.log(playerName);
+        score = score.toString();
+        if (!localStorage.getItem('high-score')) {
+          localStorage.setItem('high-score', score);
+        }
+        if (!localStorage.getItem('name')) {
+          localStorage.setItem('name', playerName);
+        }
+        let highScore = localStorage.getItem('high-score');
+
+        if (parseInt(score) > parseInt(highScore)) {
+          highScore = score;
+          highScore = highScore.toString();
+          localStorage.setItem('name', playerName);
+          localStorage.setItem('high-score', highScore);
+        }
+        const scoreListName = document.createElement('h2');
+        const scoreListScore = document.createElement('h2');
+        scoreListName.textContent = `Top attempt: ${localStorage.getItem(
+          'name'
+        )}`;
+        scoreListScore.textContent = `High score: ${localStorage.getItem(
+          'high-score'
+        )}`;
+
+        document.body.appendChild(scoreListName);
+        document.body.appendChild(scoreListScore);
+        document.querySelector('#initials-input').remove();
+        event.target.remove();
       }
-
-      countdownEl.remove();
-
-      colorTextEl.textContent = 'Congratulations!';
-      colorTextEl.style.color = 'green';
-      announcementEl.textContent = 'your score is: ' + score;
-      console.log(announcementEl);
-      console.log(score);
-
-      questionEl.remove();
     }
   }
 }
