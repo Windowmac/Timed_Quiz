@@ -33,6 +33,38 @@ const questionArray = [
     options: ['data types', 'objects', 'strings', 'all of the above'],
     correctAnswer: 'all of the above',
   },
+  {
+    textOfQuestion: 'DOM stands for: ',
+    options: [
+      'Document Of More(info)',
+      'Document Object Model',
+      'Document Or Model',
+      'Dominant Office Model',
+    ],
+    correctAnswer: 'Document Object Model',
+  },
+  {
+    textOfQuestion: 'True/False: JQuery is an extension to JavaScript',
+    options: ['True', 'False'],
+    correctAnswer: 'True',
+  },
+  {
+    textOfQuestion:
+      'True/False: valid variable initialization needs to contain "let", "const", or "var" at the beginning of the statement',
+    options: ['True', 'False'],
+    correctAnswer: 'True',
+  },
+  {
+    textOfQuestion: 'To create an array of numbers: ',
+    options: [
+      'const numArray = [1, 2, 3];',
+      'let numArray = [1, 2, 3];',
+      'const numArray = [1, 2, "33", "4"];',
+      'const number array = 1, 2, 3;',
+      'var . = {...one, two, three}',
+    ],
+    correctAnswer: 'const numArray = [1, 2, 3];',
+  },
 ];
 
 //set timer to 60 seconds.
@@ -44,7 +76,7 @@ const questionArray = [
 //when quiz is ended, wipe question container element and replace with a form element to enter name and save high score
 //score displayed next to form element.
 
-let timeLeft = 60;
+let timeLeft = 80;
 const countdownEl = document.getElementById('countdown');
 countdownEl.textContent = `${timeLeft} seconds left`;
 
@@ -123,7 +155,7 @@ function handleStartButton(event) {
 
     countdownEl.remove();
 
-    colorTextEl.textContent = 'Congratulations!';
+    colorTextEl.textContent = 'Congratulations! ';
     colorTextEl.style.color = 'green';
     announcementEl.textContent = 'your score is: ' + score;
 
@@ -171,26 +203,22 @@ function handleStartButton(event) {
         let names = localStorage.getItem('name');
         names = names.split(',');
         containerEl.append(scoresList);
-        scoresList.textContent = 'High Scores: ';
+        scoresList.textContent = 'Top Scores: ';
         scoresList.style.fontSize = '35px';
 
-        scoresCount = highScores.length;
+        const scoresCount = highScores.length;
         let placeholder = 0;
         for (i = 0; i < scoresCount; i++) {
           if (
             parseInt(score) > parseInt(highScores[i]) &&
             highScores[i] !== placeholder
           ) {
-            console.log(highScores[i]);
-            console.log(score);
-            console.log(placeholder);
             placeholder = highScores[i];
             console.log(placeholder);
             highScores.splice(i, 0, score);
             names.splice(i, 0, playerName);
           }
           if (highScores.length < 3 && score !== highScores[i]) {
-            console.log('hello from here');
             highScores.push(score);
             names.push(playerName);
           }
