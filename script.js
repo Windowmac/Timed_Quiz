@@ -83,6 +83,7 @@ function handleStartButton(event) {
       questionEl.textContent = questionArray[questionCount].textOfQuestion;
       for (let i = 0; i < questionArray[questionCount].options.length; i++) {
         let option = document.createElement('li');
+        option.classList.add('good-btn');
         option.textContent = questionArray[questionCount].options[i];
         questionEl.appendChild(option);
         option.addEventListener('click', handleQuestionClick);
@@ -138,44 +139,105 @@ function handleStartButton(event) {
       inputEl.id = 'initials-input';
       const submitEl = document.createElement('btn');
       submitEl.id = 'submit';
+      submitEl.classList.add('danger-btn');
       submitEl.textContent = 'Submit';
       containerEl.appendChild(inputEl);
       containerEl.appendChild(submitEl);
 
       submitEl.addEventListener('click', handleSubmit);
 
+      //check if high-scores are present in local storage
+      //if not, create a new local storage key named high-scores and save the new score
+      //also save the new player name in a separate local storage key named 'name'
+      //if so, save the high-scores string to an array, broken up at comma space (, )
+      //for each item in the highScores array check if new score is larger -
+      //if so, unshift at location and delete array at the end if greater than length of 3
+      //save new scores to local storage as a string
+      //display scores and names as an ordered list
+
       function handleSubmit(event) {
         event.preventDefault();
         const playerName = inputEl.value;
-        console.log(playerName);
+        const scoresList = document.createElement('ol');
         score = score.toString();
-        if (!localStorage.getItem('high-score')) {
-          localStorage.setItem('high-score', score);
-        }
-        if (!localStorage.getItem('name')) {
+
+        if (!localStorage.getItem('high-scores')) {
+          localStorage.setItem('high-scores', score);
           localStorage.setItem('name', playerName);
         }
-        let highScore = localStorage.getItem('high-score');
 
-        if (parseInt(score) > parseInt(highScore)) {
-          highScore = score;
-          highScore = highScore.toString();
-          localStorage.setItem('name', playerName);
-          localStorage.setItem('high-score', highScore);
+        let highScores = localStorage.getItem('high-scores');
+        highScores = highScores.split(',');
+        let names = localStorage.getItem('name');
+        names = names.split(',');
+        containerEl.append(scoresList);
+        scoresList.textContent = 'High Scores: ';
+        scoresList.style.fontSize = '35px';
+
+        scoresCount = highScores.length;
+        let placeholder = 0;
+        for (i = 0; i < scoresCount; i++) {
+          if (
+            parseInt(score) > parseInt(highScores[i]) &&
+            highScores[i] !== placeholder
+          ) {
+            console.log(highScores[i]);
+            console.log(score);
+            console.log(placeholder);
+            placeholder = highScores[i];
+            console.log(placeholder);
+            highScores.splice(i, 0, score);
+            names.splice(i, 0, playerName);
+          }
+          if (highScores.length < 3 && score !== highScores[i]) {
+            console.log('hello from here');
+            highScores.push(score);
+            names.push(playerName);
+          }
         }
-        const scoreListName = document.createElement('h2');
-        const scoreListScore = document.createElement('h2');
-        scoreListName.textContent = `Top attempt: ${localStorage.getItem(
-          'name'
-        )}`;
-        scoreListScore.textContent = `High score: ${localStorage.getItem(
-          'high-score'
-        )}`;
 
-        document.body.appendChild(scoreListName);
-        document.body.appendChild(scoreListScore);
+        while (highScores.length > 3) {
+          highScores.pop();
+          names.pop();
+        }
+
+        for (let i = 0; i < highScores.length; i++) {
+          const listEl = document.createElement('li');
+          listEl.textContent = `${names[i]}      ......................      Score: ${highScores[i]}`;
+          listEl.classList.add('score-li');
+          scoresList.appendChild(listEl);
+        }
+
+        highScores = highScores.toString();
+        names = names.toString();
+        localStorage.setItem('high-scores', highScores);
+        localStorage.setItem('name', names);
         document.querySelector('#initials-input').remove();
         event.target.remove();
+
+        const clearStorageBtn = document.createElement('btn');
+        clearStorageBtn.id = 'clear-storage';
+        clearStorageBtn.classList.add('danger-btn');
+        clearStorageBtn.textContent = 'Clear Scores';
+        clearStorageBtn.addEventListener('click', handleClearStorage);
+
+        const retryBtn = document.createElement('btn');
+        retryBtn.id = 'retry';
+        retryBtn.classList.add('danger-btn');
+        retryBtn.textContent = 'Retry';
+        retryBtn.addEventListener('click', handleRetry);
+
+        document.body.appendChild(retryBtn);
+        document.body.appendChild(clearStorageBtn);
+
+        function handleClearStorage(event) {
+          localStorage.clear();
+          scoresList.remove();
+        }
+
+        function handleRetry(event) {
+          location.reload();
+        }
       }
     }
   }
