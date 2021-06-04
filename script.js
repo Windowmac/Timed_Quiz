@@ -1,7 +1,4 @@
-//create start button to intiate the timer
-//create an array of questions
-//each question is an object with the text of the question, co
-
+//array of questions for user to answer
 const questionArray = [
   {
     textOfQuestion: 'what is a boolean?',
@@ -67,14 +64,15 @@ const questionArray = [
   },
 ];
 
-//set timer to 60 seconds.
+//set timer to 80 seconds.
 //user clicks on start button, 1st question shows up in questions container, countdown begins
-//user clicks on question - message displays confirming correct or incorrect over question content
-//if correct, display 'correct! (please click)' in #question, check if there are any more questions to display, then display next question.
+//user clicks on question answer - message displays confirming correct or incorrect over question content
+//if correct, display 'correct! next question' in #question, check if there are any more questions to display, then display next question.
 //if there are no more questions to display - end quiz and calculate score
-//if incorrect, display 'incorrect! (please click)' in #question, subtract time, redisplay question.
+//if incorrect, display 'incorrect! repeat question' in #question, subtract time, redisplay question.
 //when quiz is ended, wipe question container element and replace with a form element to enter name and save high score
-//score displayed next to form element.
+//'congratulations! score is: ' displayed.
+//display user's local storage top 3 scores.
 
 let timeLeft = 80;
 const countdownEl = document.getElementById('countdown');
@@ -89,12 +87,14 @@ const announcementEl = document.getElementById('announcement');
 const containerEl = document.getElementById('question-container');
 const listItems = document.getElementsByTagName('li');
 
+//remove start button, replace text content, start countdown, start questions
 function handleStartButton(event) {
   startCountdown();
   startButtonEl.remove();
   document.getElementById('title').remove();
   announcementEl.textContent = 'Go!';
 
+  //start countdown using handleInterval, if not already endGame when timer ends, start endGame
   function startCountdown() {
     const timeInterval = setInterval(handleInterval, 1000);
     function handleInterval() {
@@ -110,6 +110,11 @@ function handleStartButton(event) {
   }
   startQuestions();
 
+  //check if question count is valid
+  //if not, endGame
+  //if so, display question at question count
+  //create li of answers for question
+  //append li to question element, add click event
   function startQuestions() {
     if (questionArray[questionCount]) {
       questionEl.textContent = questionArray[questionCount].textOfQuestion;
@@ -120,8 +125,16 @@ function handleStartButton(event) {
         questionEl.appendChild(option);
         option.addEventListener('click', handleQuestionClick);
 
+        //check question count, if greater than question array, endGame
+        //create a variabe of the user's choice they clicked
+        //create a variable of the correct answer
+        //compare the choice against the correct answer
+        //if correct - write 'correct' with blue text, increase question count, change text content to 'next question: '
+        //restart questions
+        //if incorrect - write 'incorrect' in red text, change text content to 'repeat question: ', decrease time left by 5
+        //restart questions
         function handleQuestionClick(event) {
-          if (questionCount > questionArray.length - 1 || timeLeft <= 0) {
+          if (questionCount > questionArray.length - 1) {
             endGame(timeLeft);
           }
 
@@ -135,7 +148,7 @@ function handleStartButton(event) {
             announcementEl.textContent = 'Next question: ';
             startQuestions();
           } else {
-            timeLeft = timeLeft - 5;
+            timeLeft -= 5;
             colorTextEl.textContent = 'Incorrect! ';
             colorTextEl.style.color = 'red';
             announcementEl.textContent = '-5 seconds, repeat question: ';
@@ -147,6 +160,12 @@ function handleStartButton(event) {
       endGame(timeLeft);
     }
   }
+
+  //check timer, multiply by 100 to find score. if timer is negative, set score to 0.
+  //remove countdown element
+  //write 'congratulations!' in green text, 'your score is' and the user's score
+  //remove question element
+  //replace with form element
   function endGame(timeLeft) {
     let score = timeLeft * 100;
     if (score < 0) {
@@ -160,11 +179,12 @@ function handleStartButton(event) {
     announcementEl.textContent = 'your score is: ' + score;
 
     questionEl.remove();
-    //add in form element for initials
+
     handleForm();
+
+    //create a form input element with a name of initials and placeholder text of 'enter initials here'
+    //place a submit button just to the right of the form input
     function handleForm() {
-      //create a form input element with a name of initials and placeholder text of 'enter initials here'
-      //place a submit button just to the right of the form input
       const inputEl = document.createElement('input');
       inputEl.placeholder = 'Enter your initials here';
       inputEl.name = 'initials';
@@ -181,12 +201,11 @@ function handleStartButton(event) {
       //check if high-scores are present in local storage
       //if not, create a new local storage key named high-scores and save the new score
       //also save the new player name in a separate local storage key named 'name'
-      //if so, save the high-scores string to an array, broken up at comma space (, )
+      //if scores are present, pull the high-scores string to an array, separated at comma (,)
       //for each item in the highScores array check if new score is larger -
-      //if so, unshift at location and delete array at the end if greater than length of 3
+      //if so, splice at location and pop off the score at the end of the array if the array length is greater than 3
       //save new scores to local storage as a string
       //display scores and names as an ordered list
-
       function handleSubmit(event) {
         event.preventDefault();
         const playerName = inputEl.value;
@@ -206,65 +225,83 @@ function handleStartButton(event) {
         scoresList.textContent = 'Top Scores: ';
         scoresList.style.fontSize = '35px';
 
-        const scoresCount = highScores.length;
-        let placeholder = 0;
-        for (i = 0; i < scoresCount; i++) {
-          if (
-            parseInt(score) > parseInt(highScores[i]) &&
-            highScores[i] !== placeholder
-          ) {
-            placeholder = highScores[i];
-            console.log(placeholder);
-            highScores.splice(i, 0, score);
-            names.splice(i, 0, playerName);
+        handleHighScorePlacement();
+
+        //create a placeholder for the purpose of checking score placement - so the loop won't recheck the same score again if unshifted
+        //loop through each item of the scores array and compare the user's score with each top score.
+        //if the user's score is greater than any of the top scores && the user's score does not match the placeholder - splice at location
+        //create a variable to hold the length of the highscores array at the start of the loop - as the array may grow in length during looping
+        //pop off scores at the end of the array
+        //be sure to update name array every time you change scores array
+        //write list to dom as an ordered list displaying user's name and score
+        //save new highscore and name arrays to user storage
+        function handleHighScorePlacement() {
+          const scoresCount = highScores.length;
+          let placeholder = 0;
+          for (i = 0; i < scoresCount; i++) {
+            if (
+              parseInt(score) > parseInt(highScores[i]) &&
+              highScores[i] !== placeholder
+            ) {
+              placeholder = highScores[i];
+              console.log(placeholder);
+              highScores.splice(i, 0, score);
+              names.splice(i, 0, playerName);
+            }
+            if (highScores.length < 3 && score !== highScores[i]) {
+              highScores.push(score);
+              names.push(playerName);
+            }
           }
-          if (highScores.length < 3 && score !== highScores[i]) {
-            highScores.push(score);
-            names.push(playerName);
+
+          while (highScores.length > 3) {
+            highScores.pop();
+            names.pop();
           }
+
+          for (let i = 0; i < highScores.length; i++) {
+            const listEl = document.createElement('li');
+            listEl.textContent = `${names[i]}      ......................      Score: ${highScores[i]}`;
+            listEl.classList.add('score-li');
+            scoresList.appendChild(listEl);
+          }
+
+          highScores = highScores.toString();
+          names = names.toString();
+          localStorage.setItem('high-scores', highScores);
+          localStorage.setItem('name', names);
+          document.querySelector('#initials-input').remove();
+          event.target.remove();
         }
 
-        while (highScores.length > 3) {
-          highScores.pop();
-          names.pop();
-        }
+        makeEndgameButtons();
 
-        for (let i = 0; i < highScores.length; i++) {
-          const listEl = document.createElement('li');
-          listEl.textContent = `${names[i]}      ......................      Score: ${highScores[i]}`;
-          listEl.classList.add('score-li');
-          scoresList.appendChild(listEl);
-        }
+        //create a clear storage button which will clear user local storage
+        //create a retry button which refreshes the page with a location reload
+        function makeEndgameButtons() {
+          const clearStorageBtn = document.createElement('btn');
+          clearStorageBtn.id = 'clear-storage';
+          clearStorageBtn.classList.add('danger-btn');
+          clearStorageBtn.textContent = 'Clear Scores';
+          clearStorageBtn.addEventListener('click', handleClearStorage);
 
-        highScores = highScores.toString();
-        names = names.toString();
-        localStorage.setItem('high-scores', highScores);
-        localStorage.setItem('name', names);
-        document.querySelector('#initials-input').remove();
-        event.target.remove();
+          const retryBtn = document.createElement('btn');
+          retryBtn.id = 'retry';
+          retryBtn.classList.add('danger-btn');
+          retryBtn.textContent = 'Retry';
+          retryBtn.addEventListener('click', handleRetry);
 
-        const clearStorageBtn = document.createElement('btn');
-        clearStorageBtn.id = 'clear-storage';
-        clearStorageBtn.classList.add('danger-btn');
-        clearStorageBtn.textContent = 'Clear Scores';
-        clearStorageBtn.addEventListener('click', handleClearStorage);
+          document.body.appendChild(retryBtn);
+          document.body.appendChild(clearStorageBtn);
 
-        const retryBtn = document.createElement('btn');
-        retryBtn.id = 'retry';
-        retryBtn.classList.add('danger-btn');
-        retryBtn.textContent = 'Retry';
-        retryBtn.addEventListener('click', handleRetry);
+          function handleClearStorage(event) {
+            localStorage.clear();
+            scoresList.remove();
+          }
 
-        document.body.appendChild(retryBtn);
-        document.body.appendChild(clearStorageBtn);
-
-        function handleClearStorage(event) {
-          localStorage.clear();
-          scoresList.remove();
-        }
-
-        function handleRetry(event) {
-          location.reload();
+          function handleRetry(event) {
+            location.reload();
+          }
         }
       }
     }
